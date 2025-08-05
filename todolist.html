@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Task Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .task-item {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .priority-low { border-left: 4px solid #10B981; }
+        .priority-medium { border-left: 4px solid #F59E0B; }
+        .priority-high { border-left: 4px solid #EF4444; }
+        
+        .checkbox-container input:checked ~ .checkmark {
+            background-color: #3B82F6;
+            border-color: #3B82F6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-2xl mx-auto p-4 md:p-6">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Daily Task Master</h1>
+            <p class="text-gray-600">Organize your day with simplicity</p>
+        </header>
+
+        <!-- Add Task Form -->
+        <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+            <div class="flex">
+                <input type="text" id="taskInput" placeholder="What needs to be done?" class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select id="prioritySelect" class="border-t border-b border-gray-300 px-2 bg-gray-50 text-gray-700">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <button id="addTaskBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-r-lg transition duration-200">
+                    <i class="fas fa-plus"></i> Add
+                </button>
+            </div>
+        </div>
+
+        <!-- Task Filters -->
+        <div class="flex justify-center mb-6 space-x-2">
+            <button data-filter="all" class="filter-btn bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium">All Tasks</button>
+            <button data-filter="active" class="filter-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition">Active</button>
+            <button data-filter="completed" class="filter-btn bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg text-sm font-medium transition">Completed</button>
+        </div>
+
+        <!-- Tasks Counter -->
+        <div class="text-sm text-gray-500 mb-4">
+            <span id="tasksCount">0</span> tasks remaining
+        </div>
+
+        <!-- Tasks List -->
+        <div id="tasksContainer" class="space-y-3">
+            <!-- Tasks will be added here dynamically -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-12 hidden">
+            <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/5d9f1eb8-f89a-41ac-8ebb-3fab429c9ea7.png" alt="No tasks illustration - clipboard with a checkmark and empty text lines" class="mx-auto mb-4 rounded-lg">
+            <h3 class="text-lg font-medium text-gray-700">No tasks yet</h3>
+            <p class="text-gray-500">Add a task above to get started!</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskInput = document.getElementById('taskInput');
+            const prioritySelect = document.getElementById('prioritySelect');
+            const addTaskBtn = document.getElementById('addTaskBtn');
+            const tasksContainer = document.getElementById('tasksContainer');
+            const emptyState = document.getElementById('emptyState');
+            const tasksCount = document.getElementById('tasksCount');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            
+            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let currentFilter = 'all';
+            
+            // Render tasks based on current filter
+            function renderTasks() {
+                tasksContainer.innerHTML = '';
+                
+                const filteredTasks = tasks.filter(task => {
+                    if (currentFilter === 'all') return true;
+                    if (currentFilter === 'active') return !task.completed;
+                    if (currentFilter === 'completed') return task.completed;
+                });
+                
+                if (filteredTasks.length === 0) {
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                }
+                
+                filteredTasks.forEach((task, index) => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = `task-item bg-white rounded-lg shadow-sm p-4 flex items-center justify-between border-l-4 priority-${task.priority} ${task.completed ? 'opacity-70' : ''}`;
+                    
+                    taskElement.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <label class="checkbox-container relative block cursor-pointer">
+                                <input type="checkbox" ${task.completed ? 'checked' : ''} class="opacity-0 absolute h-0 w-0" onchange="toggleTask(${index})">
+                                <span class="checkmark absolute top-0 left-0 h-5 w-5 border border-gray-300 rounded-md"></span>
+                                <span class="text-gray-700 ml-2">${task.text}</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs px-2 py-1 rounded-full ${getPriorityBadgeClass(task.priority)}">
+                                ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                            </span>
+                            <button onclick="deleteTask(${index})" class="text-gray-400 hover:text-red-500 transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    
+                    if (task.completed) {
+                        const textElement = taskElement.querySelector('span.text-gray-700');
+                        textElement.classList.add('line-through');
+                    }
+                    
+                    tasksContainer.appendChild(taskElement);
+                });
+                
+                updateTasksCount();
+            }
+            
+            function getPriorityBadgeClass(priority) {
+                switch(priority) {
+                    case 'low': return 'bg-green-100 text-green-800';
+                    case 'medium': return 'bg-yellow-100 text-yellow-800';
+                    case 'high': return 'bg-red-100 text-red-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            }
+            
+            function addTask() {
+                const text = taskInput.value.trim();
+                if (text === '') return;
+                
+                const newTask = {
+                    text,
+                    priority: prioritySelect.value,
+                    completed: false,
+                    id: Date.now()
+                };
+                
+                tasks.unshift(newTask);
+                saveTasks();
+                taskInput.value = '';
+                renderTasks();
+            }
+            
+            function toggleTask(index) {
+                // Find the actual index in the full tasks array
+                const filteredTasks = getFilteredTasks();
+                const taskId = filteredTasks[index].id;
+                const taskIndex = tasks.findIndex(t => t.id === taskId);
+                
+                tasks[taskIndex].completed = !tasks[taskIndex].completed;
+                saveTasks();
+                renderTasks();
+            }
+            
+            function deleteTask(index) {
+                // Find the actual index in the full tasks array
+                const filteredTasks = getFilteredTasks();
+                const taskId = filteredTasks[index].id;
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveTasks();
+                renderTasks();
+            }
+            
+            function getFilteredTasks() {
+                if (currentFilter === 'all') return [...tasks];
+                if (currentFilter === 'active') return tasks.filter(task => !task.completed);
+                if (currentFilter === 'completed') return tasks.filter(task => task.completed);
+                return [];
+            }
+            
+            function saveTasks() {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
+            
+            function updateTasksCount() {
+                const activeTasks = tasks.filter(task => !task.completed).length;
+                tasksCount.textContent = activeTasks;
+            }
+            
+            // Event listeners
+            addTaskBtn.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addTask();
+                }
+            });
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentFilter = this.dataset.filter;
+                    filterButtons.forEach(btn => {
+                        if (btn === this) {
+                            btn.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                            btn.classList.add('bg-blue-500', 'text-white');
+                        } else {
+                            btn.classList.remove('bg-blue-500', 'text-white');
+                            btn.classList.add('bg-gray-200', 'hover:bg-gray-300');
+                        }
+                    });
+                    renderTasks();
+                });
+            });
+            
+            // Make functions global for inline event handlers
+            window.toggleTask = toggleTask;
+            window.deleteTask = deleteTask;
+            
+            // Initial render
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
+
