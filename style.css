@@ -33,8 +33,10 @@ body{margin:0;font-family:'roboto', Tahoma, Geneva, Verdana, sans-serif;backgrou
 
 /* chart + legend */
 .chart-row{display:flex;gap:20px;align-items:flex-start}
-.chart-wrap{flex:1;min-width:380px}
-.legend-wrap{width:280px;padding:15px;border-radius:10px;background:#fff;border:1px solid #e0e0f5;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
+/* >>> PERBAIKAN: MIN-WIDTH CHART DIKURANGI AGAR MUAT BERDAMPINGAN <<< */
+.chart-wrap{flex:1;min-width:280px} 
+/* >>> PERBAIKAN: LEBAR LEGEND DIKURANGI AGAR MUAT BERDAMPINGAN <<< */
+.legend-wrap{width:200px;padding:15px;border-radius:10px;background:#fff;border:1px solid #e0e0f5;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
 .legend-wrap strong{color:#6f42c1}
 .legend-item{display:flex;gap:10px;align-items:center;margin-bottom:10px}
 .legend-color{width:20px;height:15px;border-radius:4px}
@@ -66,49 +68,50 @@ tr:nth-child(even) td{background:#f9f9f9}
 
 /* responsive */
 @media (max-width:1100px){
-  .sidebar{width:100%;min-height:auto}
-  .app{flex-direction:column}
-  .main{padding:15px}
+  /* ATURAN STACKING KARTU (.row) DAN CHART/LEGEND (.chart-row) TELAH DIHAPUS */
+  /* HANYA SISAKAN ATURAN UNTUK MAIN APP LAYOUT PADA LAYAR KECIL */
+  .sidebar{width:100%;min-height:auto}
+  .app{flex-direction:column}
+  .main{padding:15px}
 }
 /* Paging/Panel Forms */
 .category-form-panel {
-    display: none; /* Semua panel form disembunyikan */
-    min-height: 250px;
+    display: none; 
+    min-height: 250px;
 }
 .category-form-panel.active {
-    display: block; /* Hanya panel aktif yang ditampilkan */
+    display: block; 
 }
 
 .form-note {
-    display: none;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #fff;
-    text-align: center;
+    display: none;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    text-align: center;
 }
 .form-note.active {
-    display: block;
+    display: block;
 }
 /* Notifikasi Pop-up */
 .notification-popup {
-    position: fixed;
-    top: -50px; /* Mulai di luar layar */
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    background-color: #4caf50; /* Hijau */
-    color: white;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    opacity: 0; /* Awalnya transparan */
-    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Animasi bounce */
-    z-index: 1000;
+    position: fixed;
+    top: -50px; 
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background-color: #4caf50; 
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0; 
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); 
+    z-index: 1000;
 }
 
 .notification-popup.show {
-    top: 20px; /* Turun ke posisi terlihat */
-    opacity: 1;
+    top: 20px; 
+    opacity: 1;
 
 }
-
