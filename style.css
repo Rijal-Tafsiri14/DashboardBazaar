@@ -66,7 +66,6 @@ tr:nth-child(even) td{background:#f9f9f9}
 
 /* responsive */
 @media (max-width:1100px){
-  .row{flex-direction:column}
   .chart-row{flex-direction:column}
   .legend-wrap{width:100%}
   .chart-wrap{min-width:100%}
@@ -113,4 +112,5 @@ tr:nth-child(even) td{background:#f9f9f9}
 .notification-popup.show {
     top: 20px; /* Turun ke posisi terlihat */
     opacity: 1;
+
 }
