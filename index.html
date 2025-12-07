@@ -1,153 +1,178 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard Report Bazaar Offline Medan Satria</title>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Team Bazaar Offline</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app">
+    <!-- Sidebar -->
     <aside class="sidebar">
-      <h2>📊 ReportApp Team Bazaar</h2>
-      <nav>
-        <button id="navDashboard" class="active">🏠 Dashboard</button>
-        <button id="navInput">📝 Input Data</button>
+      <div class="brand">
+        <div class="brand-logo">OP</div>
+        <div class="brand-name">Dashboard Panel</div>
+      </div>
+
+      <nav class="menu">
+        <button class="menu-item active" data-target="overview">
+          <span>Overview</span>
+        </button>
+        <button class="menu-item" data-target="dataOrder">
+          <span>Data Order</span>
+        </button>
+        <button class="menu-item" data-target="projectPanin">
+          <span>Project Bank Panin</span>
+        </button>
+        <button class="menu-item" data-target="irKeluar">
+          <span>IR Keluar</span>
+        </button>
+        <button class="menu-item" data-target="irMasuk">
+          <span>IR Masuk</span>
+        </button>
+        <button class="menu-item" data-target="bazaar">
+          <span>Bazaar</span>
+        </button>
+        <div id="bazaarTeamWrap" class="nav-section">
+  <div class="nav-section-title">
+    <span class="icon">👥</span>
+    <span class="title">Tim Bazaar Ops</span>
+    <ul>
+        <li>Ibnu Rijal Tafsiri</li>
+        <li>Putu Widhi Yana</li>
+        <li>Syaifullah</li>
+        <li>Zulpan Hermawan</li>
+    </ul>
       </nav>
-      <h3>👥 Tim Bazaar Ops</h3>
-            <ul>
-              <li>Ibnu Rijal Tafsiri</li>
-              <li>Putu Widhi Yana</li>
-              <li>Syaifullah</li>
-              <li>Zulpan Hermawan</li>
-            </ul>
     </aside>
 
+    <!-- Main -->
     <main class="main">
-      <header class="topbar">
-        <h1>Dashboard Report Team Bazaar Offline</h1>
-        <div class="top-actions">
-          <select id="filterTanggal"></select>
-          <button id="refreshBtn">🔁 Refresh</button>
+      <!-- Navbar -->
+      <header class="navbar">
+        <div class="nav-left">
+          <button class="btn icon" id="sidebarToggle" aria-label="Toggle sidebar">
+            <span class="material-symbols">☰</span>
+          </button>
+          <h1 class="nav-title">Dashboard Team Bazaar Offline</h1>
         </div>
-       <div id="notificationPopup" class="notification-popup">
-        ✅ Data Dashboard berhasil diperbarui!
-      </div>
+        <div class="nav-right">
+  <div class="date-filter">
+    <span id="todayText"></span>
+    <input type="date" id="overviewStart" />
+    <input type="date" id="overviewEnd" />
+    <button class="btn primary" id="overviewFilterBtn">Filter</button>
+  </div>
+  <button class="btn" id="refreshBtn">Refresh</button>
+</div>
+
       </header>
 
-      <section id="dashboard" class="panel active">
-        <div class="row">
-          <div class="card">
-            <div class="card-head">
-              <h3>📦 Data Order</h3>
-              <div class="card-actions">
-                <button class="btn small" id="exportOrder">⬇️ Export</button>
-                <button class="btn small danger" id="deleteAllOrder">🗑 Hapus Semua</button>
+      <!-- Content -->
+      <section class="content" id="contentRoot">
+        <!-- Overview -->
+        <div class="view show" id="overview">
+          <div class="grid two">
+            <div class="card">
+              <div class="card-header">
+                <h3>Ringkasan Data Order</h3>
+                <div class="card-actions">
+                  <button class="btn ghost" id="resetOrder">Reset</button>
+                </div>
               </div>
+              <canvas id="orderPie" height="220"></canvas>
             </div>
-
-            <div class="chart-row">
-              <div class="chart-wrap"><canvas id="chartOrder"></canvas></div>
-             
-            </div>
-
-              <table id="orderTable"><thead></thead><tbody></tbody></table>
+            <div class="card">
+              <div class="card-header">
+                <h3>Ringkasan Project Bank Panin</h3>
+                <div class="card-actions">
+                  <button class="btn ghost" id="resetPanin">Reset</button>
+                </div>
+              </div>
+              <canvas id="paninPie" height="220"></canvas>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-head">
-              <h3>🏦 Project Bank Panin</h3>
-              <div class="card-actions">
-                <button class="btn small" id="exportPanin">⬇️ Export</button>
-                <button class="btn small danger" id="deleteAllPanin">🗑 Hapus Semua</button>
-              </div>
+          <div class="grid three mt-24">
+            <div class="stat-card">
+              <div class="stat-label">Total IR Keluar</div>
+              <div class="stat-value" id="totalIrKeluar">0</div>
+              <div class="stat-sub" id="totalIrKeluarSub">SKU: 0 • Qty: 0</div>
             </div>
-
-            <div class="chart-row">
-              <div class="chart-wrap"><canvas id="chartPanin"></canvas></div>
+            <div class="stat-card">
+              <div class="stat-label">Total IR Masuk (Balik)</div>
+              <div class="stat-value" id="totalIrMasuk">0</div>
+              <div class="stat-sub" id="totalIrMasukSub">SKU: 0 • Qty: 0</div>
             </div>
-
-            <div class="table-wrap">
-              <table id="paninTable"><thead></thead><tbody></tbody></table>
-            </div>
-          </div>
-
-
-        <div class="row">
-          <div class="card">
-            <div class="card-head">
-              <h3>🚚 Data IR Keluar</h3>
-              <div class="card-actions">
-                <button class="btn small" id="exportOut">⬇️ Export</button>
-                <button class="btn small danger" id="deleteAllOut">🗑 Hapus Semua</button>
-              </div>
-            </div>
-            <div class="table-wrap">
-              <table id="tableOut"><thead></thead><tbody></tbody></table>
+            <div class="stat-card">
+              <div class="stat-label">Event Bazaar Aktif</div>
+              <div class="stat-value" id="bazaarActive">0</div>
+              <div class="stat-sub" id="bazaarActiveSub">Minggu ini</div>
             </div>
           </div>
 
-          <div class="card">
-            <div class="card-head">
-              <h3>📥 Data IR Masuk</h3>
-              <div class="card-actions">
-                <button class="btn small" id="exportIn">⬇️ Export</button>
-                <button class="btn small danger" id="deleteAllIn">🗑 Hapus Semua</button>
+          <!-- Dua tabel ringkas untuk IR, terpisah dari tabel Bazaar -->
+          <div class="grid two mt-24">
+            <div class="table-card compact">
+              <div class="table-header">
+                <h3>IR Masuk (Balik) Terbaru</h3>
               </div>
+              <table class="table small" id="overviewIrMasukTable">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th><th>Jumlah IR</th><th>Warehouse</th><th>SKU</th><th>Qty</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
-            <div class="table-wrap">
-              <table id="tableIn"><thead></thead><tbody></tbody></table>
+            <div class="table-card compact">
+              <div class="table-header">
+                <h3>IR Keluar Terbaru</h3>
+              </div>
+              <table class="table small" id="overviewIrKeluarTable">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th><th>Jumlah IR</th><th>Warehouse</th><th>SKU</th><th>Qty</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
+          </div>
+
+          <!-- Tabel Bazaar berdiri sendiri (full width) dengan kolom Keterangan -->
+          <div class="table-card mt-24">
+            <div class="table-header">
+              <h3>Bazaar Terbaru</h3>
+            </div>
+            <table class="table" id="overviewBazaarTable">
+              <thead>
+                <tr>
+                  <th>Project</th><th>Mulai</th><th>Selesai</th><th>Keterangan</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
           </div>
         </div>
-        
-        <div class="row">
-          <div class="card" style="flex: 2;">
-            <div class="card-head">
-              <h3>🎪 Data Bazaar</h3>
-              <div class="card-actions">
-                <button class="btn small" id="exportBazaar">⬇️ Export</button>
-                <button class="btn small danger" id="deleteAllBazaar">🗑 Hapus Semua</button>
-              </div>
-            </div>
-            <div class="table-wrap">
-              <table id="tableBazaar"><thead></thead><tbody></tbody></table>
-            </div>
-          </div>
-        </div>
 
+        <!-- Dynamic forms and tables rendered here -->
+        <div class="view" id="dataOrder"></div>
+        <div class="view" id="projectPanin"></div>
+        <div class="view" id="irKeluar"></div>
+        <div class="view" id="irMasuk"></div>
+        <div class="view" id="bazaar"></div>
       </section>
 
-     <section id="input" class="panel">
-        <div class="card">
-          <h3>📝 Input Data</h3>
-
-          <label>Pilih Kategori:</label>
-          <select id="categorySelect">
-            <option value="">-- Pilih Kategori --</option>
-            <option value="order">Data Order</option>
-            <option value="panin">Project Bank Panin</option>
-            <option value="irKeluar">Data IR Keluar</option>
-            <option value="irMasuk">Data IR Masuk</option>
-            <option value="bazaar">Data Bazaar</option>
-          </select>
-
-          <div id="formContainer" style="margin-top: 15px;">
-            <div class="form-note active" id="formNote">Pilih kategori untuk menampilkan form input.</div>
-            <div id="form-order" class="category-form-panel"></div>
-            <div id="form-panin" class="category-form-panel"></div>
-            <div id="form-irKeluar" class="category-form-panel"></div>
-            <div id="form-irMasuk" class="category-form-panel"></div>
-            <div id="form-bazaar" class="category-form-panel"></div>
-          </div>
-        </div>
-      </section>
-
+      <footer class="footer">
+        <span>© 2025 Operasional Panel</span>
+        <span>Auto-refresh harian aktif</span>
+      </footer>
     </main>
   </div>
 
